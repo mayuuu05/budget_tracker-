@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../controller/budget_controller.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -11,6 +10,9 @@ class DashboardPage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final HomeController controller = Get.put(HomeController());
+    final double expensePercentage = controller.totalIncome.value > 0
+        ? (controller.totalExpense.value / controller.totalIncome.value) * 100
+        : 0;
 
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
@@ -38,76 +40,43 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: screenHeight * 0.05),
-              _buildCard(
+              buildCard(
                 context,
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildOverItem(
-                          icon: Icons.attach_money,
-                          label: 'Income',
-                          amount: controller.totalIncome.value.toString(),
-                        ),
-                        _buildOverItem(
+                      Obx(() =>   buildOverItem(
+                        icon: Icons.attach_money,
+                        label: 'Income',
+                        amount: controller.totalIncome.value.toString(),
+                      ),),
+                        Obx(() => buildOverItem(
                           icon: Icons.money_off,
                           label: 'Expenses',
                           amount: controller.totalExpense.value.toString(),
-                        ),
-                        _buildOverItem(
-                          icon: Icons.savings,
-                          label: 'Savings',
-                          amount: '0',
+                        ),),
+
+
+                        buildOverItem(
+                          icon: Icons.account_balance,
+                          label: 'Balance',
+                          amount: '${controller.totalIncome.value - controller.totalExpense.value}',
                         ),
                       ],
                     ),
                     SizedBox(height: screenHeight * 0.02),
-                    _buildProgressBar(
+                    buildProgressBar(
                       context,
-                      label: 'Budget Used',
-                      percentage: 60, // Example percentage
+                      label: 'Expense Ratio',
+                      percentage: expensePercentage,
                     ),
                   ],
-                ),
+                )
               ),
               SizedBox(height: screenHeight * 0.05),
-              _buildCard(
-                context,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Recent Transactions',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    _buildTransactionItem(
-                      icon: Icons.fastfood,
-                      label: 'Lunch',
-                      amount: '-\$12.00',
-                      color: Colors.red,
-                    ),
-                    _buildTransactionItem(
-                      icon: Icons.shopping_bag,
-                      label: 'Shopping',
-                      amount: '-\$30.00',
-                      color: Colors.red,
-                    ),
-                    _buildTransactionItem(
-                      icon: Icons.account_balance_wallet,
-                      label: 'Salary',
-                      amount: '+\$1500.00',
-                      color: Colors.green,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.05),
-              _buildQuote(context, "“Save more, worry less.”"),
+              buildQuote(context, "“Save more, worry less.”"),
             ],
           ),
         ),
@@ -115,7 +84,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, {required Widget child}) {
+  Widget buildCard(BuildContext context, {required Widget child}) {
     return Container(
       padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
@@ -134,7 +103,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOverItem({
+  Widget buildOverItem({
     required IconData icon,
     required String label,
     required String amount,
@@ -163,8 +132,9 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressBar(BuildContext context,
-      {required String label, required int percentage}) {
+  Widget buildProgressBar(BuildContext context, {required String label, required double percentage}) {
+    final cappedPercentage = percentage.clamp(0, 100); 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,7 +157,7 @@ class DashboardPage extends StatelessWidget {
               ),
             ),
             Container(
-              width: MediaQuery.of(context).size.width * (percentage / 100),
+              width: MediaQuery.of(context).size.width * (cappedPercentage / 100).clamp(0, 1).toDouble(),
               height: 8,
               decoration: BoxDecoration(
                 color: const Color(0xffb43b28),
@@ -198,7 +168,7 @@ class DashboardPage extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '$percentage% of your Expense ',
+          '${cappedPercentage.toStringAsFixed(1)}% of your Income spent',
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 12,
@@ -208,43 +178,8 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionItem({
-    required IconData icon,
-    required String label,
-    required String amount,
-    required Color color,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 24),
-              const SizedBox(width: 16),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildQuote(BuildContext context, String quote) {
+  Widget buildQuote(BuildContext context, String quote) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0),
@@ -257,6 +192,6 @@ class DashboardPage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ) ;
   }
 }

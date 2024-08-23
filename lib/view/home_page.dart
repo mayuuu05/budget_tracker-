@@ -1,9 +1,11 @@
 
+import 'package:budget_tracker/view/income.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/budget_controller.dart';
 import '../controller/navigate.dart';
 import 'dashboard.dart';
+import 'expense.dart';
 import 'home_content..dart';
 
 class HomePage extends StatelessWidget {
@@ -33,7 +35,7 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(onPressed: () {
 
-          }, icon: Icon(Icons.notifications_active,color: Colors.white,))
+          }, icon: Icon(Icons.settings,color: Colors.white,))
         ],
         backgroundColor: const Color(0xffb43b28),
         elevation: 0,
@@ -41,11 +43,13 @@ class HomePage extends StatelessWidget {
       body: Obx(() => IndexedStack(
         index: navController.selectedIndex.value,
         children: [ HomeContent(),
-          DashboardPage(),
-          DashboardPage(),],
+          const DashboardPage(),
+          Income(),
+          Expense(),]
       )),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: Obx(() => BottomNavigationBar(
         backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xffb43b28),
         unselectedItemColor: Colors.black54,
         showSelectedLabels: true,
@@ -62,11 +66,16 @@ class HomePage extends StatelessWidget {
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.savings),
+            label: 'Income',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.money_off),
+            label: 'Expense',
+          ),
+
         ],
-      ),
+      ),)
 
     );
   }

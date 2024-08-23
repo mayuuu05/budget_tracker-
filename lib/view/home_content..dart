@@ -133,23 +133,34 @@ class HomeContent extends StatelessWidget {
                                     ),
                                     SizedBox(height: 16),
                                     TextField(
+                                      cursorColor: Colors.black,
                                       controller: homeController.txtAmount,
-                                      decoration: const InputDecoration(labelText: 'Amount'),
+                                      decoration: const InputDecoration(labelText: 'Amount',labelStyle: TextStyle(
+                                        color: Colors.grey,
+                                      )),
                                       keyboardType: TextInputType.number,
                                     ),
                                     SizedBox(height: 16),
                                     TextField(
+                                      cursorColor: Colors.black,
                                       controller: homeController.txtCategory,
-                                      decoration: const InputDecoration(labelText: 'Category'),
+                                      decoration: const InputDecoration(labelText: 'Amount',labelStyle: TextStyle(
+                                        color: Colors.grey,
+                                      )),
                                     ),
                                     SizedBox(height: 16),
                                     Obx(
                                           () => SwitchListTile(
-                                        title: const Text('Income/Expense'),
+                                        activeColor: Colors.green,
+                                        title: Text(homeController.isIncome.value ? 'Income' : 'Expense',style: TextStyle(
+                                            color: homeController.isIncome.value ? Colors.green : Colors.red
+                                        ),),
+
                                         value: homeController.isIncome.value,
                                         onChanged: (value) {
                                           homeController.setIncome(value);
                                         },
+
                                       ),
                                     ),
                                     SizedBox(height: 24),
@@ -227,6 +238,8 @@ class HomeContent extends StatelessWidget {
               child: FloatingActionButton(
                 backgroundColor: const Color(0xffb43b28),
                 onPressed: () {
+                  homeController.txtAmount.clear();
+                  homeController.txtCategory.clear();
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -262,11 +275,16 @@ class HomeContent extends StatelessWidget {
                           SizedBox(height: 16),
                           Obx(
                                 () => SwitchListTile(
-                              title: const Text('Income/Expense'),
+                                  activeColor: Colors.green,
+                              title: Text(homeController.isIncome.value ? 'Income' : 'Expense',style: TextStyle(
+                                color: homeController.isIncome.value ? Colors.green : Colors.red
+                              ),),
+
                               value: homeController.isIncome.value,
                               onChanged: (value) {
                                 homeController.setIncome(value);
                               },
+
                             ),
                           ),
                           SizedBox(height: 24),
@@ -284,18 +302,19 @@ class HomeContent extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: const Text('Cancel',style: TextStyle(color: Colors.white),),
+                                child: const Text('Cancel', style: TextStyle(color: Colors.white)),
                               ),
                               ElevatedButton(
                                 onPressed: () {
                                   double amount = double.parse(homeController.txtAmount.text);
                                   int isIncome = homeController.isIncome.value ? 1 : 0;
                                   String category = homeController.txtCategory.text;
+
                                   homeController.insertRecord(amount, isIncome, category);
 
                                   homeController.txtAmount.clear();
                                   homeController.txtCategory.clear();
-                                  homeController.setIncome(false);
+                                  homeController.setIncome(false); // Reset to default if needed
                                   Get.back();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -305,7 +324,7 @@ class HomeContent extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: const Text('Save',style: TextStyle(color: Colors.white),),
+                                child: const Text('Save', style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -314,6 +333,7 @@ class HomeContent extends StatelessWidget {
                     ),
                   );
                 },
+
                 child: const Icon(Icons.add, color: Colors.white),
               ),
             ),
